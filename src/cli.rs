@@ -9,7 +9,7 @@ use std::process;
 #[command(
     name = "memoria",
     about = "Memoria: The Black Box for Your Black Box — Out-of-band immutable action ledger for AI agents.",
-    version = "0.2.0"
+    version = "0.3.0"
 )]
 pub struct Cli {
     #[arg(short, long, default_value = "default", global = true)]
@@ -78,6 +78,28 @@ pub enum Commands {
     Export {
         #[arg(short, long)]
         out: Option<PathBuf>,
+    },
+    /// Supervise an untrusted agent with physical verification and issue tracking
+    Run {
+        /// GitHub Issue number to link and audit
+        #[arg(long)]
+        issue: Option<String>,
+
+        /// Independent verification command to execute on host post-run
+        #[arg(long)]
+        verify_cmd: Option<String>,
+
+        /// Require at least one passing test execution recorded in the physical ledger
+        #[arg(long)]
+        require_tests: bool,
+
+        /// Automatically close GitHub issue upon verified audit pass
+        #[arg(long)]
+        auto_close: bool,
+
+        /// Command to execute under supervision
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        cmd: Vec<String>,
     },
 }
 
@@ -300,6 +322,54 @@ pub fn run() {
             Err(e) => {
                 eprintln!("Failed to generate export: {}", e);
                 process::exit(1);
+            }
+        },
+        Commands::Run {
+            issue,
+            verify_cmd,
+            require_tests,
+            auto_close,
+            mut cmd,
+        } => {
+            if !cmd.is_empty() && cmd[0] == "--" {
+                cmd.remove(0);
+            }
+            if cmd.is_empty() {
+                eprintln!("Error: No command specified to run. Usage: memoria run [options] -- <command> [args...]");
+                process::exit(1);
+            }
+
+            let project_name = if let Some(iss) = &issue {
+                format!("issue-{}", iss)
+            } else {
+                project.to_string()
+            };
+
+            let session_name = format!("run_{}", chrono::Utc::now().format("%Y%m%d_%H%M%S"));
+
+            let config = crate::runner::RunConfig {
+                issue,
+                verify_cmd,
+                require_tests,
+                auto_close,
+                cmd,
+                project: project_name,
+                session: session_name,
+                db_path,
+            };
+
+            match crate::runner::execute_supervised_run(config) {
+                Ok(res) => {
+                    if res.verification_passed {
+                        process::exit(0);
+                    } else {
+                        process::exit(1);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("[memoria run] Fatal execution error: {}", e);
+                    process::exit(1);
+                }
             }
         },
     }

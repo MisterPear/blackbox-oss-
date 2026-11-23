@@ -1,6 +1,7 @@
 target/
 .memoria/
 memoria_audit_*.html
+memoria_flight_report_*.html
 *.db
 *.db-wal
 *.db-shm

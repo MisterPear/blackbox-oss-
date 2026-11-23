@@ -320,6 +320,46 @@ impl MemoriaLedger {
         Ok(actions)
     }
 
+    pub fn get_session_actions(&self, project_name: &str, session_id: &str) -> SqlResult<Vec<TaskAction>> {
+        let conn = self.get_connection()?;
+        let mut stmt = conn.prepare(
+            "SELECT id, project_name, session_id, timestamp_start, timestamp_end,
+                    duration_ms, action_type, target, parameters, result_snippet,
+                    exit_code, bytes_out, prev_hash, entry_hash
+             FROM task_ledger
+             WHERE project_name=?1 AND session_id=?2
+             ORDER BY id ASC",
+        )?;
+
+        let rows = stmt.query_map(params![project_name, session_id], |row| {
+            let params_str: String = row.get(8)?;
+            let params_val: Value = serde_json::from_str(&params_str).unwrap_or(Value::Null);
+
+            Ok(TaskAction {
+                id: row.get(0)?,
+                project_name: row.get(1)?,
+                session_id: row.get(2)?,
+                timestamp_start: row.get(3)?,
+                timestamp_end: row.get(4)?,
+                duration_ms: row.get(5)?,
+                action_type: row.get(6)?,
+                target: row.get(7)?,
+                parameters: params_val,
+                result_snippet: row.get(9)?,
+                exit_code: row.get(10)?,
+                bytes_out: row.get(11)?,
+                prev_hash: row.get(12)?,
+                entry_hash: row.get(13)?,
+            })
+        })?;
+
+        let mut actions = Vec::new();
+        for r in rows {
+            actions.push(r?);
+        }
+        Ok(actions)
+    }
+
     pub fn get_context(&self, project_name: &str, limit: usize) -> SqlResult<Vec<StageContext>> {
         let conn = self.get_connection()?;
         let mut stmt = conn.prepare(

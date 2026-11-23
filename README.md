@@ -123,6 +123,27 @@ In your `claude_desktop_config.json` or `cursor.json`:
 
 ---
 
+## Out-of-Band Lifecycle Supervision (`memoria run`)
+
+Supervise autonomous agents with strict ground-truth verification and automated issue tracking:
+
+```bash
+# Supervise an agent working on GitHub Issue #2
+# Rule: Do not trust exit code 0 alone. Require physical test execution and clean host verification.
+memoria run --issue 2 --verify-cmd "cargo test" --require-tests --auto-close -- claude-code
+```
+
+**What the supervisor enforces:**
+1. **Pre-Flight**: Links to the GitHub issue and initializes a tamper-evident session.
+2. **In-Flight**: Intercepts every command, argument, and byte through the physical wiretap.
+3. **Post-Flight ("Don't Trust Exit 0")**:
+   - Cryptographically verifies the SHA-256 hash chain back to genesis.
+   - Audits `task_ledger` to confirm passing test suites (`cargo test`, `pytest`, etc.) were physically executed.
+   - Independently runs `--verify-cmd` on the clean host outside the agent's reach.
+   - Automatically formats an execution ledger comment on GitHub, updates checklists, and exports an air-gapped HTML flight report.
+
+---
+
 ## Grounding Reality
 When you (or the agent) want to verify what was actually executed:
 ```bash

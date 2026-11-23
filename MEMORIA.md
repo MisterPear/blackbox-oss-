@@ -58,3 +58,12 @@ memoria mcp -- python3 /path/to/mcp_server.py
 ```
 
 Memoria captures the physical execution automatically and seals it to the ledger.
+
+---
+
+## 4. Task Reporting & Verification Protocol
+
+When working on assigned tasks or issue tickets:
+1. **Never claim completion without physical execution**: Exit code `0` or self-assurance is not verification. Always execute the compiler and test suite via the wiretap before stating work is complete.
+2. **Commit milestones to the ledger**: As milestones pass, record them via `memoria stage <name> "<description>"`.
+3. **Verify ground reality before sign-off**: Run `memoria actions --limit 5` and `memoria verify` to confirm your execution chain is cryptographically sealed and tests are physically recorded in the flight ledger.
