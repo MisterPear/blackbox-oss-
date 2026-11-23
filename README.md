@@ -1,6 +1,19 @@
-# Memoria: The Black Box for Your Black Box
+<p align="center">
+  <img src="assets/logo.svg" width="220" alt="black box" />
+</p>
 
-> **Out-of-band immutable action ledger and execution flight recorder for autonomous AI agents.**
+<h1 align="center">black box</h1>
+
+<p align="center">
+  <strong>Out-of-band immutable action ledger and execution flight recorder for autonomous AI agents.</strong>
+</p>
+
+<p align="center">
+  <a href="#30-second-quickstart">Quickstart</a> •
+  <a href="docs/PROVENANCE.md">Verifiable Provenance</a> •
+  <a href="#out-of-band-lifecycle-supervision-memoria-run">Supervisor</a> •
+  <a href="https://www.mallard.ink">Mallard Unified Industries</a>
+</p>
 
 ---
 
