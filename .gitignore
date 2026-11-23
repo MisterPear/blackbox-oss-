@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.memoria/
+memoria_audit_*.html
+*.egg-info/
+dist/
+build/
+.venv/
