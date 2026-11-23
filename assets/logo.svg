@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    
+    <filter id="paper-texture" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="15" result="noise" />
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.045 0" in="noise" result="faintNoise" />
+      <feComposite operator="in" in="faintNoise" in2="SourceGraphic" result="clippedNoise" />
+      <feBlend mode="multiply" in="SourceGraphic" in2="clippedNoise" />
+    </filter>
+
+    
+    <clipPath id="inner-screen-clip">
+      <rect x="267" y="334" width="490" height="304" rx="28" />
+    </clipPath>
+
+    
+    <clipPath id="bottom-bezel-clip">
+      <rect x="378" y="655" width="234" height="104" />
+    </clipPath>
+  </defs>
+
+  
+  <g id="background">
+    <rect width="1024" height="1024" fill="#F8F5E8" />
+    <rect width="1024" height="1024" fill="#F5F1E0" filter="url(#paper-texture)" />
+    
+    <g fill="#E2DBC3" opacity="0.55">
+      <circle cx="142" cy="188" r="2.2" />
+      <circle cx="885" cy="145" r="1.8" />
+      <circle cx="920" cy="410" r="2.5" />
+      <circle cx="110" cy="640" r="2.0" />
+      <circle cx="860" cy="790" r="2.1" />
+      <circle cx="215" cy="915" r="1.9" />
+      <circle cx="512" cy="95" r="1.6" />
+      <circle cx="745" cy="940" r="2.3" />
+      <ellipse cx="95" cy="310" rx="3" ry="1.2" transform="rotate(25 95 310)" />
+      <ellipse cx="935" cy="680" rx="2.8" ry="1.4" transform="rotate(-15 935 680)" />
+      <ellipse cx="320" cy="110" rx="2.5" ry="1.1" transform="rotate(40 320 110)" />
+    </g>
+  </g>
+
+  
+  <g id="case-icon" fill="#0B0B0A">
+    
+    <path d="M 380 208
+             L 380 185
+             C 380 152, 404 134, 438 134
+             L 586 134
+             C 620 134, 644 152, 644 185
+             L 644 208
+             L 606 208
+             L 606 188
+             C 606 175, 596 168, 582 168
+             L 442 168
+             C 428 168, 418 175, 418 188
+             L 418 208 Z" />
+
+    
+    
+    <path d="M 150 302
+             C 150 250, 184 222, 236 222
+             L 246 222
+             L 246 278
+             C 226 280, 214 290, 212 302 Z" />
+    
+    <path d="M 258 222
+             L 366 222
+             L 366 314
+             L 288 314
+             C 256 314, 246 326, 246 356
+             L 246 410
+             L 150 410
+             L 150 352
+             L 212 352
+             L 212 322
+             C 212 296, 228 286, 258 286 Z" />
+    
+    <rect x="378" y="222" width="244" height="92" />
+    
+    <path d="M 634 222
+             L 742 222
+             L 742 286
+             C 772 286, 788 296, 788 322
+             L 788 352
+             L 874 352
+             L 874 410
+             L 778 410
+             L 778 356
+             C 778 326, 768 314, 736 314
+             L 634 314 Z" />
+    
+    <path d="M 754 222
+             L 788 222
+             C 840 222, 874 250, 874 302
+             L 812 302
+             C 810 290, 798 280, 778 278
+             L 778 222 Z" />
+
+    
+    
+    <rect x="150" y="424" width="64" height="124" rx="8" />
+    
+    <path d="M 150 562
+             L 246 562
+             L 246 616
+             C 246 646, 256 658, 288 658
+             L 366 658
+             L 366 758
+             L 258 758
+             L 258 686
+             C 228 686, 212 676, 212 650
+             L 212 620
+             L 150 620 Z" />
+    
+    <path d="M 150 670
+             L 212 670
+             C 214 682, 226 692, 246 694
+             L 246 758
+             L 236 758
+             C 184 758, 150 730, 150 678 Z" />
+
+    
+    <rect x="378" y="658" width="44" height="100" />
+    
+    <rect x="498" y="658" width="124" height="100" />
+
+    
+    <path d="M 634 658
+             L 736 658
+             C 768 658, 778 646, 778 616
+             L 778 562
+             L 874 562
+             L 874 620
+             L 812 620
+             L 812 650
+             C 812 676, 796 686, 766 686
+             L 766 758
+             L 634 758 Z" />
+    
+    <path d="M 812 670
+             L 874 670
+             L 874 678
+             C 874 730, 840 758, 788 758
+             L 778 758
+             L 778 694
+             C 798 692, 810 682, 812 670 Z" />
+
+    
+    <rect x="810" y="424" width="64" height="124" rx="8" />
+    
+    <path d="M 874 360 L 892 360 C 896 360, 898 363, 898 367 L 898 403 C 898 407, 896 410, 892 410 L 882 410 L 882 396 L 874 396 Z" />
+    
+    <path d="M 874 562 L 892 562 C 896 562, 898 565, 898 569 L 898 605 C 898 609, 896 612, 892 612 L 882 612 L 882 598 L 874 598 Z" />
+
+    
+    <rect x="267" y="334" width="490" height="304" rx="28" />
+  </g>
+
+  
+  <g id="retro-ribbon" fill="none" stroke-linecap="butt">
+    
+    <g clip-path="url(#inner-screen-clip)">
+      
+      <path d="M 692 325 C 692 465, 625 512, 540 548 C 468 578, 434 610, 424 650" stroke="#D69E2E" stroke-width="26" />
+      
+      <path d="M 716 325 C 716 478, 646 528, 558 565 C 488 595, 456 622, 446 650" stroke="#D3592A" stroke-width="26" />
+      
+      <path d="M 740 325 C 740 492, 668 545, 578 582 C 510 610, 478 634, 468 650" stroke="#73918C" stroke-width="26" />
+    </g>
+
+    
+    <g clip-path="url(#bottom-bezel-clip)">
+      
+      <path d="M 426 648 C 416 688, 410 725, 408 765" stroke="#D69E2E" stroke-width="26" />
+      
+      <path d="M 450 648 C 440 688, 434 725, 432 765" stroke="#D3592A" stroke-width="26" />
+      
+      <path d="M 474 648 C 464 688, 458 725, 456 765" stroke="#73918C" stroke-width="26" />
+    </g>
+  </g>
+
+  
+  <g id="wordmark" fill="#0B0B0A">
+    <text x="163" y="902" font-family="'Helvetica Neue', Helvetica, 'Inter', 'Futura', Arial, sans-serif" font-weight="700" font-size="146" letter-spacing="-4.5">black box</text>
+    
+    <rect x="812" y="841" width="62" height="62" fill="#D3592A" />
+  </g>
+</svg>
