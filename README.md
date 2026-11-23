@@ -145,4 +145,4 @@ Drop `MEMORIA.md` into your repository. It instructs OpenClaw, Claude Code, Curs
 
 ## License
 
-MIT License. Designed and built by Mallard.
+MIT License. Designed and built by [Mallard Unified Industries](https://www.mallard.ink).

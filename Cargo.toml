@@ -3,9 +3,10 @@ name = "memoria"
 version = "0.1.0"
 edition = "2021"
 description = "The Black Box for Your Black Box: Immutable, out-of-band action ledger and flight recorder for autonomous AI agents."
-authors = ["Mallard <dev@mallard.sh>"]
+authors = ["Mallard Unified Industries <dev@mallard.ink>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://www.mallard.ink"
 repository = "https://github.com/MisterPear/memoria-oss"
 
 [dependencies]
