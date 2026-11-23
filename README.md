@@ -59,37 +59,61 @@ Memoria splits agent memory into two decoupled tiers:
 
 ## 30-Second Quickstart
 
-### 1. Installation (Zero External Dependencies)
+### 1. Human Installation (Never Installed by the Agent)
 
-Memoria is built entirely with Python standard library. No external pip bloat.
+The human operator installs Memoria outside the agent's environment. The agent never installs or touches the auditor:
 
 ```bash
-git clone https://github.com/mallard/memoria.git
-cd memoria
-pip install -e .
+# Build standalone static binary from source:
+cargo build --release
+sudo cp target/release/memoria /usr/local/bin/
+
+# Or download the prebuilt standalone binary from GitHub Releases:
+# curl -fsSL https://github.com/mallard/memoria/releases/latest/download/memoria -o /usr/local/bin/memoria
+# chmod +x /usr/local/bin/memoria
 ```
 
-### 2. Wrap Any CLI Tool
-Prefix any command with `memoria wrap`:
+---
+
+## Harness Integration Snippets
+
+Memoria is 100% harness-agnostic. You do not need separate installers—just configure your harness to route tool calls or commands through `memoria`:
+
+### 1. Claude Code
+Prefix your Claude Code session:
 ```bash
-memoria wrap -- pytest tests/
-memoria wrap -- cargo build --release
+memoria wrap -- claude-code
+```
+Or route internal bash calls through `memoria wrap -- <cmd>`.
+
+### 2. OpenClaw
+Run OpenClaw inside the Memoria wiretap:
+```bash
+memoria wrap -- openclaw run
 ```
 
-### 3. Wiretap Any MCP Server (Model Context Protocol)
-Wrap your MCP server in your `claude_desktop_config.json` or agent config:
+### 3. Gemini CLI / Standalone Agent Scripts
+Wrap any agent script or CLI:
+```bash
+memoria wrap -- gemini run "Analyze codebase and run unit tests"
+```
+
+### 4. Cursor / Claude Desktop (Model Context Protocol)
+In your `claude_desktop_config.json` or `cursor.json`:
 ```json
 {
   "mcpServers": {
-    "my_tool": {
+    "terminal": {
       "command": "memoria",
-      "args": ["mcp", "--", "python3", "/path/to/server.py"]
+      "args": ["mcp", "--project", "my-repo", "--", "npx", "-y", "@modelcontextprotocol/server-terminal"]
     }
   }
 }
 ```
 
-### 4. Grounding Reality
+---
+
+## Grounding Reality
 When you (or the agent) want to verify what was actually executed:
 ```bash
 # Query the physical action index

@@ -1,8 +1,6 @@
-__pycache__/
-*.pyc
+target/
 .memoria/
 memoria_audit_*.html
-*.egg-info/
-dist/
-build/
-.venv/
+*.db
+*.db-wal
+*.db-shm
