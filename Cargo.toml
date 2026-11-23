@@ -6,7 +6,7 @@ description = "The Black Box for Your Black Box: Immutable, out-of-band action l
 authors = ["Mallard <dev@mallard.sh>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/mallard/memoria"
+repository = "https://github.com/MisterPear/memoria-oss"
 
 [dependencies]
 rusqlite = { version = "0.31", features = ["bundled"] }

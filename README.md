@@ -69,7 +69,7 @@ cargo build --release
 sudo cp target/release/memoria /usr/local/bin/
 
 # Or download the prebuilt standalone binary from GitHub Releases:
-# curl -fsSL https://github.com/mallard/memoria/releases/latest/download/memoria -o /usr/local/bin/memoria
+# curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/memoria
 # chmod +x /usr/local/bin/memoria
 ```
 
