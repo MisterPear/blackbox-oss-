@@ -174,6 +174,27 @@ Drop `MEMORIA.md` into your repository. It instructs OpenClaw, Claude Code, Curs
 
 ---
 
+## Storage & Configuration
+
+By default, Memoria stores its append-only ledger locally inside each project's directory:
+
+* **Default Location**: `./.memoria/memoria.db` (created automatically in the current working directory).
+* **CLI Override**: Pass `--db <path>` to any command:
+  ```bash
+  memoria --db /var/log/audit.db actions
+  ```
+* **Environment Variable Override**: Set `MEMORIA_DB_PATH` in your shell or CI environment:
+  ```bash
+  export MEMORIA_DB_PATH="/opt/audit/production.db"
+  ```
+* **Project Scoping**: Isolate multiple projects or sessions within the same ledger using `--project`:
+  ```bash
+  memoria --project frontend-app wrap -- npm test
+  memoria --project backend-api wrap -- pytest
+  ```
+
+---
+
 ## License
 
 MIT License. Designed and built by [Mallard Unified Industries](https://www.mallard.ink).
