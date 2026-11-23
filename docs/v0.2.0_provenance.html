@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memoria Flight Recorder // memoria-v0.2.0</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --accent: #58a6ff;
+            --success: #3fb950;
+            --danger: #f85149;
+            --warning: #d29922;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tagline {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-family: monospace;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .badge-verified { background: rgba(63, 185, 80, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .badge-tampered { background: rgba(248, 81, 73, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .card-header {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        pre {
+            background: #040d21;
+            padding: 0.75rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            color: #79c0ff;
+            margin: 0.5rem 0 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .hash {
+            color: var(--text-dim);
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="margin: 0; font-size: 1.6rem; letter-spacing: -0.5px;">MEMORIA // FLIGHT RECORDER</h1>
+                <div class="tagline">The Black Box for Your Black Box • Target: <strong>memoria-v0.2.0</strong></div>
+            </div>
+            <div>
+                <span class="status-badge badge-verified">HASH CHAIN VALID (3 BLOCKS)</span>
+            </div>
+        </div>
+
+        <h2>Physical Action Ledger (3 recorded actions)</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <strong>#3 // cli_command</strong> ➔ <code>cargo</code>
+                </div>
+                <div>
+                    <span style="color: var(--success); font-weight: bold;">EXIT 0</span> • 34.2ms • 2026-11-23T22:51:00.296647449+00:00
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem;">Parameters:</div>
+                <pre>{
+  &quot;argv&quot;: [
+    &quot;cargo&quot;,
+    &quot;build&quot;,
+    &quot;--release&quot;,
+    &quot;--target&quot;,
+    &quot;x86_64-unknown-linux-musl&quot;
+  ]
+}</pre>
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.75rem; margin-bottom: 0.25rem;">Output Snippet:</div>
+                <pre style="color: #a5d6ff;">    Finished `release` profile [optimized] target(s) in 0.02s
+</pre>
+                <div class="hash" style="margin-top: 0.75rem;">SHA-256 Block: a950cb896c99ea8b4c3d0516c0226a799e8402914305a65145b8387e0f98cdbe</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <strong>#2 // cli_command</strong> ➔ <code>cargo</code>
+                </div>
+                <div>
+                    <span style="color: var(--success); font-weight: bold;">EXIT 0</span> • 790.2ms • 2026-11-23T22:50:59.501028628+00:00
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem;">Parameters:</div>
+                <pre>{
+  &quot;argv&quot;: [
+    &quot;cargo&quot;,
+    &quot;test&quot;
+  ]
+}</pre>
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.75rem; margin-bottom: 0.25rem;">Output Snippet:</div>
+                <pre style="color: #a5d6ff;">
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 4 tests
+test test_utf8_multibyte_safety ... ok
+test test_stage_actor_tiering ... ok
+test test_ledger_immutability_triggers ... ok
+test test_concurrent_write_safety ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+
+running 2 tests
+wiretap_verified_rust
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</pre>
+                <div class="hash" style="margin-top: 0.75rem;">SHA-256 Block: eacf6fcc7792a673d313fb2f727b3797ed527d35217366d7bd64e21e0690ae81</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <strong>#1 // cli_command</strong> ➔ <code>cargo</code>
+                </div>
+                <div>
+                    <span style="color: var(--success); font-weight: bold;">EXIT 0</span> • 4388.0ms • 2026-11-23T22:50:55.107740694+00:00
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem;">Parameters:</div>
+                <pre>{
+  &quot;argv&quot;: [
+    &quot;cargo&quot;,
+    &quot;check&quot;,
+    &quot;--target&quot;,
+    &quot;x86_64-unknown-linux-musl&quot;
+  ]
+}</pre>
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.75rem; margin-bottom: 0.25rem;">Output Snippet:</div>
+                <pre style="color: #a5d6ff;">    Checking ahash v0.8.13
+   Compiling libsqlite3-sys v0.28.0
+    Checking serde_json v1.0.154
+   Compiling serde_derive v1.0.229
+   Compiling clap_derive v4.6.9
+    Checking hashbrown v0.14.5
+    Checking hashlink v0.9.1
+    Checking clap v4.6.9
+    Checking serde v1.0.229
+    Checking chrono v0.4.45
+    Checking rusqlite v0.31.0
+    Checking memoria v0.2.0 (/mnt/nvme400/dev/memoria-oss)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.37s
+</pre>
+                <div class="hash" style="margin-top: 0.75rem;">SHA-256 Block: 78a5a63c03adddba3f8b4d47af5db09f1b8942210ab2898d277193429f4dbf0b</div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

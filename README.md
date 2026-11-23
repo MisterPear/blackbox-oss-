@@ -64,14 +64,24 @@ Memoria splits agent memory into two decoupled tiers:
 The human operator installs Memoria outside the agent's environment. The agent never installs or touches the auditor:
 
 ```bash
-# Build standalone static binary from source:
-cargo build --release
-sudo cp target/release/memoria /usr/local/bin/
+# Download the prebuilt zero-dependency static binary (musl) from GitHub Releases:
+curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/memoria
+chmod +x /usr/local/bin/memoria
 
-# Or download the prebuilt standalone binary from GitHub Releases:
-# curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/memoria
-# chmod +x /usr/local/bin/memoria
+# Or build from source with the static musl target:
+cargo build --release --target x86_64-unknown-linux-musl
+sudo cp target/x86_64-unknown-linux-musl/release/memoria /usr/local/bin/
 ```
+
+---
+
+## Verifiable Open Provenance
+
+Memoria practices self-hosting auditability: the `v0.2.0` release was recorded and cryptographically verified using Memoria itself.
+
+See [docs/PROVENANCE.md](docs/PROVENANCE.md) for the complete cryptographic hash chain, execution telemetry, and milestone audit log.
+
+---
 
 ---
 

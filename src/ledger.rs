@@ -11,6 +11,13 @@ pub fn get_iso_timestamp() -> String {
     Utc::now().to_rfc3339()
 }
 
+pub fn safe_truncate_str(s: &str, max_chars: usize) -> &str {
+    match s.char_indices().nth(max_chars) {
+        Some((byte_idx, _)) => &s[..byte_idx],
+        None => s,
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskAction {
     pub id: i64,
@@ -41,6 +48,7 @@ pub struct StageContext {
     pub last_updated: String,
     pub action_ids: Vec<i64>,
     pub notes: Option<String>,
+    pub actor: String,
 }
 
 pub struct MemoriaLedger {
@@ -108,12 +116,42 @@ impl MemoriaLedger {
                 first_logged TEXT NOT NULL,
                 last_updated TEXT NOT NULL,
                 action_ids TEXT NOT NULL,
-                notes TEXT
+                notes TEXT,
+                actor TEXT NOT NULL DEFAULT 'agent'
             );
             CREATE INDEX IF NOT EXISTS idx_tl_project ON task_ledger(project_name);
             CREATE INDEX IF NOT EXISTS idx_tl_session ON task_ledger(session_id);
-            CREATE INDEX IF NOT EXISTS idx_sl_project ON stage_ledger(project_name);",
+            CREATE INDEX IF NOT EXISTS idx_sl_project ON stage_ledger(project_name);
+
+            -- DB-Level Immutability: Prevent row modification or deletion
+            CREATE TRIGGER IF NOT EXISTS prevent_task_ledger_update
+            BEFORE UPDATE ON task_ledger
+            BEGIN
+                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: task_ledger is strictly append-only. Modifying existing entries is prohibited.');
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS prevent_task_ledger_delete
+            BEFORE DELETE ON task_ledger
+            BEGIN
+                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: task_ledger is strictly append-only. Deleting ledger entries is prohibited.');
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS prevent_stage_ledger_update
+            BEFORE UPDATE ON stage_ledger
+            BEGIN
+                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: stage_ledger is strictly append-only. Modifying existing stages is prohibited.');
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS prevent_stage_ledger_delete
+            BEFORE DELETE ON stage_ledger
+            BEGIN
+                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: stage_ledger is strictly append-only. Deleting stage entries is prohibited.');
+            END;",
         )?;
+
+        // Ensure actor column exists in stage_ledger for backward-compatible schemas
+        let _ = conn.execute("ALTER TABLE stage_ledger ADD COLUMN actor TEXT NOT NULL DEFAULT 'agent'", []);
+
         Ok(())
     }
 
@@ -139,9 +177,11 @@ impl MemoriaLedger {
         result_snippet: Option<&str>,
         bytes_out: i64,
     ) -> SqlResult<i64> {
-        let conn = self.get_connection()?;
+        let mut conn = self.get_connection()?;
+        // Concurrency Safety: Immediate transaction acquires write lock upfront, preventing hash chain forks
+        let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
         
-        let prev_hash: String = conn
+        let prev_hash: String = tx
             .query_row(
                 "SELECT entry_hash FROM task_ledger WHERE project_name=?1 ORDER BY id DESC LIMIT 1",
                 params![project_name],
@@ -168,15 +208,10 @@ impl MemoriaLedger {
 
         let entry_hash = Self::calculate_entry_hash(&prev_hash, &hashable_payload);
 
-        let snippet_truncated = result_snippet.map(|s| {
-            if s.len() > 2000 {
-                &s[..2000]
-            } else {
-                s
-            }
-        });
+        // UTF-8 Hardening: Safe character boundary truncation to prevent multi-byte panic
+        let snippet_truncated = result_snippet.map(|s| safe_truncate_str(s, 2000));
 
-        conn.execute(
+        tx.execute(
             "INSERT INTO task_ledger (
                 project_name, session_id, timestamp_start, timestamp_end,
                 duration_ms, action_type, target, parameters,
@@ -199,7 +234,9 @@ impl MemoriaLedger {
             ],
         )?;
 
-        Ok(conn.last_insert_rowid())
+        let row_id = tx.last_insert_rowid();
+        tx.commit()?;
+        Ok(row_id)
     }
 
     pub fn commit_stage(
@@ -211,16 +248,18 @@ impl MemoriaLedger {
         outcome: &str,
         action_ids: &[i64],
         notes: Option<&str>,
+        actor: &str,
     ) -> SqlResult<i64> {
-        let conn = self.get_connection()?;
+        let mut conn = self.get_connection()?;
+        let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
         let now = get_iso_timestamp();
         let ids_json = serde_json::to_string(action_ids).unwrap_or_else(|_| "[]".to_string());
 
-        conn.execute(
+        tx.execute(
             "INSERT INTO stage_ledger (
                 project_name, session_id, stage_name, step_description,
-                outcome, first_logged, last_updated, action_ids, notes
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+                outcome, first_logged, last_updated, action_ids, notes, actor
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
             params![
                 project_name,
                 session_id,
@@ -230,11 +269,14 @@ impl MemoriaLedger {
                 now,
                 now,
                 ids_json,
-                notes
+                notes,
+                actor
             ],
         )?;
 
-        Ok(conn.last_insert_rowid())
+        let row_id = tx.last_insert_rowid();
+        tx.commit()?;
+        Ok(row_id)
     }
 
     pub fn get_recent_actions(&self, project_name: &str, limit: usize) -> SqlResult<Vec<TaskAction>> {
@@ -263,7 +305,7 @@ impl MemoriaLedger {
                 action_type: row.get(6)?,
                 target: row.get(7)?,
                 parameters: params_val,
-                result_snippet: row.get(8)?,
+                result_snippet: row.get(9)?,
                 exit_code: row.get(10)?,
                 bytes_out: row.get(11)?,
                 prev_hash: row.get(12)?,
@@ -282,7 +324,7 @@ impl MemoriaLedger {
         let conn = self.get_connection()?;
         let mut stmt = conn.prepare(
             "SELECT id, project_name, session_id, stage_name, step_description,
-                    outcome, first_logged, last_updated, action_ids, notes
+                    outcome, first_logged, last_updated, action_ids, notes, actor
              FROM stage_ledger
              WHERE project_name=?1
              ORDER BY id DESC
@@ -304,6 +346,7 @@ impl MemoriaLedger {
                 last_updated: row.get(7)?,
                 action_ids: ids_val,
                 notes: row.get(9)?,
+                actor: row.get::<_, Option<String>>(10)?.unwrap_or_else(|| "agent".to_string()),
             })
         })?;
 

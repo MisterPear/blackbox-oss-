@@ -24,6 +24,8 @@ fn test_command_wiretap_and_export() {
         .as_ref()
         .unwrap()
         .contains("wiretap_verified_rust"));
+    // Verify bytes_out was counted accurately
+    assert!(actions[0].bytes_out > 0);
 
     // Verify hash chain
     let (valid, count, err) = ledger.verify_integrity("unit_test").unwrap();
@@ -38,4 +40,22 @@ fn test_command_wiretap_and_export() {
     let content = std::fs::read_to_string(out_file).unwrap();
     assert!(content.contains("wiretap_verified_rust"));
     assert!(content.contains("HASH CHAIN VALID"));
+}
+
+#[test]
+fn test_exact_byte_accounting() {
+    let tmp = tempdir().unwrap();
+    let db_path = tmp.path().join("test_bytes.db");
+
+    // Generate exactly 10,000 bytes of output
+    let script = "print('A' * 10000, end='')";
+    let cmd = vec!["python3".to_string(), "-c".to_string(), script.to_string()];
+    let code = run_command_wiretap(&cmd, "bytes_test", "sess_b", Some(db_path.clone())).unwrap();
+    assert_eq!(code, 0);
+
+    let ledger = MemoriaLedger::new(Some(db_path)).unwrap();
+    let actions = ledger.get_recent_actions("bytes_test", 1).unwrap();
+    assert_eq!(actions.len(), 1);
+    // Should be exactly 10,000 bytes counted, not capped at 50 lines or 4096
+    assert_eq!(actions[0].bytes_out, 10000);
 }

@@ -65,7 +65,7 @@ pub fn run_command_wiretap(
 
     let t_out = thread::spawn(move || {
         let mut buf = [0u8; 4096];
-        let mut total_chunks = Vec::new();
+        let mut snippet_bytes = Vec::new();
         let mut total_bytes = 0i64;
         let mut stdout_handle = io::stdout();
 
@@ -76,16 +76,17 @@ pub fn run_command_wiretap(
             let _ = stdout_handle.write_all(&buf[..n]);
             let _ = stdout_handle.flush();
             total_bytes += n as i64;
-            if total_chunks.len() < 20 {
-                total_chunks.extend_from_slice(&buf[..n]);
+            if snippet_bytes.len() < 4096 {
+                let take = std::cmp::min(n, 4096 - snippet_bytes.len());
+                snippet_bytes.extend_from_slice(&buf[..take]);
             }
         }
-        let _ = tx_out.send((total_bytes, total_chunks));
+        let _ = tx_out.send((total_bytes, snippet_bytes));
     });
 
     let t_err = thread::spawn(move || {
         let mut buf = [0u8; 4096];
-        let mut total_chunks = Vec::new();
+        let mut snippet_bytes = Vec::new();
         let mut total_bytes = 0i64;
         let mut stderr_handle = io::stderr();
 
@@ -96,11 +97,12 @@ pub fn run_command_wiretap(
             let _ = stderr_handle.write_all(&buf[..n]);
             let _ = stderr_handle.flush();
             total_bytes += n as i64;
-            if total_chunks.len() < 20 {
-                total_chunks.extend_from_slice(&buf[..n]);
+            if snippet_bytes.len() < 4096 {
+                let take = std::cmp::min(n, 4096 - snippet_bytes.len());
+                snippet_bytes.extend_from_slice(&buf[..take]);
             }
         }
-        let _ = tx_err.send((total_bytes, total_chunks));
+        let _ = tx_err.send((total_bytes, snippet_bytes));
     });
 
     let status = child.wait()?;
@@ -254,6 +256,40 @@ pub fn run_mcp_stdio_wiretap(
                 }
             }
         }
+    }
+
+    // Drain any remaining tool calls sent right before disconnect
+    while let Ok((id_val, tool_name, args, t_s, t_s_iso)) = rx_mcp_call.try_recv() {
+        let id_key = id_val.to_string();
+        pending_calls.insert(id_key, PendingMcpCall {
+            tool_name,
+            arguments: args,
+            t_start: t_s,
+            t_start_iso: t_s_iso,
+        });
+    }
+
+    // Orphaned MCP Detection: Record unanswered tool calls on disconnect/crash
+    for (call_id, call_info) in pending_calls.drain() {
+        let t_end_iso = get_iso_timestamp();
+        let duration_ms = call_info.t_start.elapsed().as_secs_f64() * 1000.0;
+        eprintln!(
+            "[memoria] WARNING: Orphaned MCP call detected (id={}, tool={}). Server exited before responding.",
+            call_id, call_info.tool_name
+        );
+        let _ = ledger.record_action(
+            project_name,
+            session_id,
+            "mcp_tool_call",
+            &call_info.tool_name,
+            call_info.arguments,
+            &call_info.t_start_iso,
+            &t_end_iso,
+            duration_ms,
+            124, // 124 = Timeout / dropped tool call
+            Some("[memoria] UNANSWERED_MCP_CALL: Server process terminated or disconnected before responding."),
+            0,
+        );
     }
 
     let _ = t_read_out.join();

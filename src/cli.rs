@@ -1,4 +1,4 @@
-use crate::ledger::MemoriaLedger;
+use crate::ledger::{safe_truncate_str, MemoriaLedger};
 use crate::viewer::generate_html_report;
 use crate::wiretap::{run_command_wiretap, run_mcp_stdio_wiretap};
 use clap::{Parser, Subcommand};
@@ -9,7 +9,7 @@ use std::process;
 #[command(
     name = "memoria",
     about = "Memoria: The Black Box for Your Black Box — Out-of-band immutable action ledger for AI agents.",
-    version = "0.1.0"
+    version = "0.2.0"
 )]
 pub struct Cli {
     #[arg(short, long, default_value = "default", global = true)]
@@ -63,6 +63,14 @@ pub enum Commands {
 
         #[arg(long)]
         notes: Option<String>,
+
+        /// Certify this milestone as human-verified
+        #[arg(long)]
+        human: bool,
+
+        /// Explicit actor identity (defaults to 'human' if --human is passed, otherwise 'agent')
+        #[arg(long)]
+        actor: Option<String>,
     },
     /// Verify cryptographic hash chain integrity
     Verify,
@@ -151,12 +159,12 @@ pub fn run() {
                     );
                     if let Some(snippet) = &a.result_snippet {
                         let clean = snippet.trim().replace('\n', " ");
-                        let truncated = if clean.len() > 80 {
-                            format!("{}...", &clean[..77])
+                        let truncated = safe_truncate_str(&clean, 77);
+                        if truncated.len() < clean.len() {
+                            println!("   ↳ {}...", truncated);
                         } else {
-                            clean
-                        };
-                        println!("   ↳ {}", truncated);
+                            println!("   ↳ {}", truncated);
+                        }
                     }
                 }
             }
@@ -189,13 +197,19 @@ pub fn run() {
                     } else {
                         &s.last_updated
                     };
+                    let actor_badge = if s.actor == "human" {
+                        "[HUMAN CERTIFIED]"
+                    } else {
+                        "[AGENT]"
+                    };
                     println!(
-                        "[{}] #{} [{}] {} (outcome: {})",
+                        "[{}] #{} [{}] {} (outcome: {}, actor: {})",
                         ts,
                         s.id,
                         s.stage_name.to_uppercase(),
                         s.step_description,
-                        s.outcome
+                        s.outcome,
+                        actor_badge
                     );
                 }
             }
@@ -205,6 +219,8 @@ pub fn run() {
             step,
             outcome,
             notes,
+            human,
+            actor,
         } => {
             let ledger = match MemoriaLedger::new(db_path) {
                 Ok(l) => l,
@@ -213,6 +229,19 @@ pub fn run() {
                     process::exit(1);
                 }
             };
+
+            let actor_str = match (human, actor) {
+                (_, Some(a)) => a,
+                (true, None) => "human".to_string(),
+                (false, None) => {
+                    if std::env::var("MEMORIA_REQUIRE_HUMAN_STAGE").is_ok() {
+                        eprintln!("[memoria] ACCESS DENIED: MEMORIA_REQUIRE_HUMAN_STAGE is set. Stages must be recorded with --human.");
+                        process::exit(1);
+                    }
+                    "agent".to_string()
+                }
+            };
+
             match ledger.commit_stage(
                 project,
                 session,
@@ -221,11 +250,12 @@ pub fn run() {
                 &outcome,
                 &[],
                 notes.as_deref(),
+                &actor_str,
             ) {
                 Ok(sid) => {
                     println!(
-                        "[memoria] Stage recorded: id={} project='{}' stage='{}'",
-                        sid, project, stage_name
+                        "[memoria] Stage recorded: id={} project='{}' stage='{}' actor='{}'",
+                        sid, project, stage_name, actor_str
                     );
                 }
                 Err(e) => {

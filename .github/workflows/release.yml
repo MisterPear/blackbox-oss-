@@ -16,19 +16,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install musl toolchain
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
 
-      - name: Build release binary
-        run: cargo build --release
+      - name: Install Rust toolchain with musl target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Build static release binary (musl)
+        run: cargo build --release --target x86_64-unknown-linux-musl
 
       - name: Strip binary
-        run: strip target/release/memoria
+        run: strip target/x86_64-unknown-linux-musl/release/memoria
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: target/release/memoria
+          files: target/x86_64-unknown-linux-musl/release/memoria
           draft: false
           prerelease: false
           generate_release_notes: true

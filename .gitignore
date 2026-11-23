@@ -4,3 +4,5 @@ memoria_audit_*.html
 *.db
 *.db-wal
 *.db-shm
+!docs/*.db
+!docs/*.html
