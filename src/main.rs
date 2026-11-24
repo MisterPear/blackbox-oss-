@@ -1,3 +1,3 @@
 fn main() {
-    memoria::cli::run();
+    blackbox::cli::run();
 }

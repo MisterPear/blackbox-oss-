@@ -81,7 +81,7 @@ The human operator installs **black box** outside the agent's environment. The a
 
 ```bash
 # Download the prebuilt zero-dependency static binary (musl) from GitHub Releases:
-curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/blackbox
+curl -fsSL https://github.com/MisterPear/blackbox-oss-/releases/latest/download/blackbox -o /usr/local/bin/blackbox
 chmod +x /usr/local/bin/blackbox
 
 # Or build from source with the static musl target:
@@ -134,6 +134,23 @@ flowchart LR
 - **Live Visual Spectator Window**: Real-time cursor and step stream rendering thinking state and tool execution live as it happens.
 
 [Follow Milestone v0.4.0 on GitHub &rarr;](https://github.com/MisterPear/blackbox-oss-/milestones)
+
+---
+
+## Next: The Ledger as Weights &middot; Alignment Training Data (v0.50.0)
+
+<p align="center">
+  <em>&ldquo;The ledger isn't just a record. It is the ground truth that fixes the problem.&rdquo;</em>
+</p>
+
+Archive black box execution ledgers in a weights-ready format (JSONL, Parquet, and DPO pairwise preference sets), green- and red-labeled (verified ground truth execution versus covert tampering and hallucinated success). 
+
+Frontier LLM labs can directly consume these verified behavioral datasets as training data:
+- **Prevent Faked Success**: Punish reward hacking where agents claim tests passed or tasks finished without physical verification.
+- **Eliminate Task Drift**: Penalize wandering off task or inventing fabricated intermediate steps.
+- **Enforce Stop-on-Failure**: Eliminate covert bypasses that swallow exceptions, suppress non-zero exit codes, or override failure boundaries.
+
+> **The Core Thesis**: *You cannot prompt an agent into honesty. Behavioral alignment requires feeding the immutable physical ground truth directly into the model's loss function.*
 
 ---
 

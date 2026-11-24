@@ -1,4 +1,4 @@
-use crate::ledger::MemoriaLedger;
+use crate::ledger::BlackBoxLedger;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -8,7 +8,7 @@ const HTML_HEAD: &str = r#"<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memoria Flight Recorder // __PROJECT__</title>
+    <title>Black Box Flight Recorder // __PROJECT__</title>
     <style>
         :root {
             --bg: #0d1117;
@@ -97,7 +97,7 @@ const HTML_HEAD: &str = r#"<!DOCTYPE html>
     <div class="container">
         <div class="header">
             <div>
-                <h1 style="margin: 0; font-size: 1.6rem; letter-spacing: -0.5px;">MEMORIA // FLIGHT RECORDER</h1>
+                <h1 style="margin: 0; font-size: 1.6rem; letter-spacing: -0.5px;">BLACK BOX // FLIGHT RECORDER</h1>
                 <div class="tagline">The Black Box for Your Black Box • Target: <strong>__PROJECT__</strong></div>
             </div>
             <div>
@@ -128,7 +128,7 @@ pub fn generate_html_report(
     db_path: Option<PathBuf>,
     output_path: Option<PathBuf>,
 ) -> io::Result<PathBuf> {
-    let ledger = MemoriaLedger::new(db_path)
+    let ledger = BlackBoxLedger::new(db_path)
         .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
 
     let actions = ledger
@@ -201,7 +201,7 @@ pub fn generate_html_report(
 
     let target_out = match output_path {
         Some(p) => p,
-        None => Path::new(&format!("memoria_audit_{}.html", project_name)).to_path_buf(),
+        None => Path::new(&format!("blackbox_audit_{}.html", project_name)).to_path_buf(),
     };
 
     fs::write(&target_out, rendered)?;

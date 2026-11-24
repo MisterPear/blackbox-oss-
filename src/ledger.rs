@@ -51,11 +51,13 @@ pub struct StageContext {
     pub actor: String,
 }
 
-pub struct MemoriaLedger {
+pub struct BlackBoxLedger {
     pub db_path: PathBuf,
 }
 
-impl MemoriaLedger {
+pub type MemoriaLedger = BlackBoxLedger;
+
+impl BlackBoxLedger {
     pub fn new(db_path: Option<PathBuf>) -> SqlResult<Self> {
         let path = match db_path {
             Some(p) => p,
@@ -131,25 +133,25 @@ impl MemoriaLedger {
             CREATE TRIGGER IF NOT EXISTS prevent_task_ledger_update
             BEFORE UPDATE ON task_ledger
             BEGIN
-                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: task_ledger is strictly append-only. Modifying existing entries is prohibited.');
+                SELECT RAISE(ABORT, 'BLACKBOX_SECURITY_VIOLATION: task_ledger is strictly append-only. Modifying existing entries is prohibited.');
             END;
 
             CREATE TRIGGER IF NOT EXISTS prevent_task_ledger_delete
             BEFORE DELETE ON task_ledger
             BEGIN
-                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: task_ledger is strictly append-only. Deleting ledger entries is prohibited.');
+                SELECT RAISE(ABORT, 'BLACKBOX_SECURITY_VIOLATION: task_ledger is strictly append-only. Deleting ledger entries is prohibited.');
             END;
 
             CREATE TRIGGER IF NOT EXISTS prevent_stage_ledger_update
             BEFORE UPDATE ON stage_ledger
             BEGIN
-                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: stage_ledger is strictly append-only. Modifying existing stages is prohibited.');
+                SELECT RAISE(ABORT, 'BLACKBOX_SECURITY_VIOLATION: stage_ledger is strictly append-only. Modifying existing stages is prohibited.');
             END;
 
             CREATE TRIGGER IF NOT EXISTS prevent_stage_ledger_delete
             BEFORE DELETE ON stage_ledger
             BEGIN
-                SELECT RAISE(ABORT, 'MEMORIA_SECURITY_VIOLATION: stage_ledger is strictly append-only. Deleting stage entries is prohibited.');
+                SELECT RAISE(ABORT, 'BLACKBOX_SECURITY_VIOLATION: stage_ledger is strictly append-only. Deleting stage entries is prohibited.');
             END;",
         )?;
 

@@ -1,4 +1,4 @@
-use memoria::ledger::MemoriaLedger;
+use blackbox::ledger::BlackBoxLedger;
 use serde_json::json;
 use std::sync::Arc;
 use std::thread;
@@ -8,7 +8,7 @@ use tempfile::tempdir;
 fn test_ledger_immutability_triggers() {
     let tmp = tempdir().unwrap();
     let db_path = tmp.path().join("test_immutability.db");
-    let ledger = MemoriaLedger::new(Some(db_path)).unwrap();
+    let ledger = BlackBoxLedger::new(Some(db_path)).unwrap();
 
     let id = ledger
         .record_action(
@@ -48,7 +48,7 @@ fn test_ledger_immutability_triggers() {
     assert!(update_res.is_err());
     let err_msg = update_res.unwrap_err().to_string();
     assert!(
-        err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
+        err_msg.contains("BLACKBOX_SECURITY_VIOLATION") || err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
         "Expected security violation, got: {}",
         err_msg
     );
@@ -58,7 +58,7 @@ fn test_ledger_immutability_triggers() {
     assert!(delete_res.is_err());
     let err_msg = delete_res.unwrap_err().to_string();
     assert!(
-        err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
+        err_msg.contains("BLACKBOX_SECURITY_VIOLATION") || err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
         "Expected security violation, got: {}",
         err_msg
     );
@@ -68,7 +68,7 @@ fn test_ledger_immutability_triggers() {
     assert!(update_stage_res.is_err());
     let err_msg = update_stage_res.unwrap_err().to_string();
     assert!(
-        err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
+        err_msg.contains("BLACKBOX_SECURITY_VIOLATION") || err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
         "Expected security violation, got: {}",
         err_msg
     );
@@ -78,7 +78,7 @@ fn test_ledger_immutability_triggers() {
     assert!(delete_stage_res.is_err());
     let err_msg = delete_stage_res.unwrap_err().to_string();
     assert!(
-        err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
+        err_msg.contains("BLACKBOX_SECURITY_VIOLATION") || err_msg.contains("MEMORIA_SECURITY_VIOLATION"),
         "Expected security violation, got: {}",
         err_msg
     );
@@ -97,7 +97,7 @@ fn test_ledger_immutability_triggers() {
 fn test_utf8_multibyte_safety() {
     let tmp = tempdir().unwrap();
     let db_path = tmp.path().join("test_utf8.db");
-    let ledger = MemoriaLedger::new(Some(db_path)).unwrap();
+    let ledger = BlackBoxLedger::new(Some(db_path)).unwrap();
 
     // Construct a 2500 character string of 4-byte unicode emojis and 3-byte CJK characters
     // Slicing at raw byte 2000 would land mid-character in a standard byte slice
@@ -130,7 +130,7 @@ fn test_utf8_multibyte_safety() {
 fn test_concurrent_write_safety() {
     let tmp = tempdir().unwrap();
     let db_path = tmp.path().join("test_concurrent.db");
-    let ledger = Arc::new(MemoriaLedger::new(Some(db_path)).unwrap());
+    let ledger = Arc::new(BlackBoxLedger::new(Some(db_path)).unwrap());
 
     let mut handles = Vec::new();
     let num_threads = 4;
@@ -174,7 +174,7 @@ fn test_concurrent_write_safety() {
 fn test_stage_actor_tiering() {
     let tmp = tempdir().unwrap();
     let db_path = tmp.path().join("test_stage_actor.db");
-    let ledger = MemoriaLedger::new(Some(db_path)).unwrap();
+    let ledger = BlackBoxLedger::new(Some(db_path)).unwrap();
 
     ledger
         .commit_stage(

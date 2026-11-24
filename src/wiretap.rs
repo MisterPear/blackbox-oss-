@@ -1,4 +1,4 @@
-use crate::ledger::{get_iso_timestamp, MemoriaLedger};
+use crate::ledger::{get_iso_timestamp, BlackBoxLedger};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::io::{self, BufRead, BufReader, Read, Write};
@@ -14,7 +14,7 @@ pub fn run_command_wiretap(
     session_id: &str,
     db_path: Option<PathBuf>,
 ) -> io::Result<i32> {
-    let ledger = MemoriaLedger::new(db_path)
+    let ledger = BlackBoxLedger::new(db_path)
         .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
 
     let target_bin = cmd_args.first().cloned().unwrap_or_else(|| "unknown".to_string());
@@ -52,7 +52,7 @@ pub fn run_command_wiretap(
                 Some(&format!("Failed to spawn: {}", e)),
                 0,
             );
-            eprintln!("[memoria] execution failure: {}", e);
+            eprintln!("[blackbox] execution failure: {}", e);
             return Ok(127);
         }
     };
@@ -154,7 +154,7 @@ pub fn run_mcp_stdio_wiretap(
     session_id: &str,
     db_path: Option<PathBuf>,
 ) -> io::Result<i32> {
-    let ledger = MemoriaLedger::new(db_path)
+    let ledger = BlackBoxLedger::new(db_path)
         .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
 
     if server_cmd.is_empty() {
@@ -274,7 +274,7 @@ pub fn run_mcp_stdio_wiretap(
         let t_end_iso = get_iso_timestamp();
         let duration_ms = call_info.t_start.elapsed().as_secs_f64() * 1000.0;
         eprintln!(
-            "[memoria] WARNING: Orphaned MCP call detected (id={}, tool={}). Server exited before responding.",
+            "[blackbox] WARNING: Orphaned MCP call detected (id={}, tool={}). Server exited before responding.",
             call_id, call_info.tool_name
         );
         let _ = ledger.record_action(
@@ -287,7 +287,7 @@ pub fn run_mcp_stdio_wiretap(
             &t_end_iso,
             duration_ms,
             124, // 124 = Timeout / dropped tool call
-            Some("[memoria] UNANSWERED_MCP_CALL: Server process terminated or disconnected before responding."),
+            Some("[blackbox] UNANSWERED_MCP_CALL: Server process terminated or disconnected before responding."),
             0,
         );
     }

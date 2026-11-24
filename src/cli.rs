@@ -1,4 +1,4 @@
-use crate::ledger::{safe_truncate_str, MemoriaLedger};
+use crate::ledger::{safe_truncate_str, BlackBoxLedger};
 use crate::viewer::generate_html_report;
 use crate::wiretap::{run_command_wiretap, run_mcp_stdio_wiretap};
 use clap::{Parser, Subcommand};
@@ -7,8 +7,8 @@ use std::process;
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "memoria",
-    about = "Memoria: The Black Box for Your Black Box — Out-of-band immutable action ledger for AI agents.",
+    name = "blackbox",
+    about = "black box: Out-of-band immutable flight recorder & action ledger for autonomous AI agents.",
     version = "0.3.0"
 )]
 pub struct Cli {
@@ -115,7 +115,7 @@ pub fn run() {
                 cmd.remove(0);
             }
             if cmd.is_empty() {
-                eprintln!("Error: No command specified to wrap. Usage: memoria wrap -- <command> [args...]");
+                eprintln!("Error: No command specified to wrap. Usage: blackbox wrap -- <command> [args...]");
                 process::exit(1);
             }
             match run_command_wiretap(&cmd, project, session, db_path) {
@@ -131,7 +131,7 @@ pub fn run() {
                 cmd.remove(0);
             }
             if cmd.is_empty() {
-                eprintln!("Error: No MCP server command specified. Usage: memoria mcp -- <server_command> [args...]");
+                eprintln!("Error: No MCP server command specified. Usage: blackbox mcp -- <server_command> [args...]");
                 process::exit(1);
             }
             match run_mcp_stdio_wiretap(&cmd, project, session, db_path) {
@@ -143,7 +143,7 @@ pub fn run() {
             }
         }
         Commands::Actions { limit, json } => {
-            let ledger = match MemoriaLedger::new(db_path) {
+            let ledger = match BlackBoxLedger::new(db_path) {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("Database error: {}", e);
@@ -162,7 +162,7 @@ pub fn run() {
                 println!("{}", serde_json::to_string_pretty(&actions).unwrap_or_default());
             } else {
                 if actions.is_empty() {
-                    println!("[memoria] No recorded actions found for project '{}'.", project);
+                    println!("[blackbox] No recorded actions found for project '{}'.", project);
                 }
                 for a in &actions {
                     let exit_str = if a.exit_code == 0 {
@@ -192,7 +192,7 @@ pub fn run() {
             }
         }
         Commands::Context { limit, json } => {
-            let ledger = match MemoriaLedger::new(db_path) {
+            let ledger = match BlackBoxLedger::new(db_path) {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("Database error: {}", e);
@@ -211,7 +211,7 @@ pub fn run() {
                 println!("{}", serde_json::to_string_pretty(&stages).unwrap_or_default());
             } else {
                 if stages.is_empty() {
-                    println!("[memoria] No stages recorded yet for project '{}'.", project);
+                    println!("[blackbox] No stages recorded yet for project '{}'.", project);
                 }
                 for s in &stages {
                     let ts = if s.last_updated.len() >= 19 {
@@ -244,7 +244,7 @@ pub fn run() {
             human,
             actor,
         } => {
-            let ledger = match MemoriaLedger::new(db_path) {
+            let ledger = match BlackBoxLedger::new(db_path) {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("Database error: {}", e);
@@ -276,7 +276,7 @@ pub fn run() {
             ) {
                 Ok(sid) => {
                     println!(
-                        "[memoria] Stage recorded: id={} project='{}' stage='{}' actor='{}'",
+                        "[blackbox] Stage recorded: id={} project='{}' stage='{}' actor='{}'",
                         sid, project, stage_name, actor_str
                     );
                 }
@@ -287,7 +287,7 @@ pub fn run() {
             }
         }
         Commands::Verify => {
-            let ledger = match MemoriaLedger::new(db_path) {
+            let ledger = match BlackBoxLedger::new(db_path) {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("Database error: {}", e);
@@ -297,16 +297,16 @@ pub fn run() {
             match ledger.verify_integrity(project) {
                 Ok((true, count, _)) => {
                     println!(
-                        "[memoria] INTEGRITY VERIFIED: {} blocks in hash chain for '{}'. Zero tampering detected.",
+                        "[blackbox] INTEGRITY VERIFIED: {} blocks in hash chain for '{}'. Zero tampering detected.",
                         count, project
                     );
                 }
                 Ok((false, _, Some(err))) => {
-                    eprintln!("[memoria] ❌ TAMPERING DETECTED: {}", err);
+                    eprintln!("[blackbox] ❌ TAMPERING DETECTED: {}", err);
                     process::exit(1);
                 }
                 Ok((false, _, None)) => {
-                    eprintln!("[memoria] ❌ TAMPERING DETECTED: Verification failed.");
+                    eprintln!("[blackbox] ❌ TAMPERING DETECTED: Verification failed.");
                     process::exit(1);
                 }
                 Err(e) => {
@@ -317,7 +317,7 @@ pub fn run() {
         }
         Commands::Export { out } => match generate_html_report(project, db_path, out) {
             Ok(p) => {
-                println!("[memoria] Flight report generated: {}", p.display());
+                println!("[blackbox] Flight report generated: {}", p.display());
             }
             Err(e) => {
                 eprintln!("Failed to generate export: {}", e);
@@ -335,7 +335,7 @@ pub fn run() {
                 cmd.remove(0);
             }
             if cmd.is_empty() {
-                eprintln!("Error: No command specified to run. Usage: memoria run [options] -- <command> [args...]");
+                eprintln!("Error: No command specified to run. Usage: blackbox run [options] -- <command> [args...]");
                 process::exit(1);
             }
 
@@ -367,7 +367,7 @@ pub fn run() {
                     }
                 }
                 Err(e) => {
-                    eprintln!("[memoria run] Fatal execution error: {}", e);
+                    eprintln!("[blackbox run] Fatal execution error: {}", e);
                     process::exit(1);
                 }
             }

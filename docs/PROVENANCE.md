@@ -57,7 +57,7 @@ The `v0.3.0` release introduces the `memoria run` out-of-band lifecycle supervis
 
 #### Re-Verifying v0.3.0 Locally:
 ```bash
-memoria --project memoria-v0.3.0 --db docs/v0.3.0_provenance.db verify
+blackbox --project memoria-v0.3.0 --db docs/v0.3.0_provenance.db verify
 ```
 
 ---
@@ -92,5 +92,5 @@ The `v0.2.0` release hardened the core physical wiretap engine with SQLite trigg
 
 #### Re-Verifying v0.2.0 Locally:
 ```bash
-memoria --project memoria-v0.2.0 --db docs/v0.2.0_provenance.db verify
+blackbox --project memoria-v0.2.0 --db docs/v0.2.0_provenance.db verify
 ```

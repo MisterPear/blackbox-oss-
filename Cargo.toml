@@ -1,5 +1,5 @@
 [package]
-name = "memoria"
+name = "blackbox"
 version = "0.3.0"
 edition = "2021"
 description = "The Black Box for Your Black Box: Immutable, out-of-band action ledger and flight recorder for autonomous AI agents."
@@ -7,10 +7,10 @@ authors = ["Mallard Unified Industries <dev@mallard.ink>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://www.mallard.ink"
-repository = "https://github.com/MisterPear/memoria-oss"
+repository = "https://github.com/MisterPear/blackbox-oss-"
 
 [lib]
-name = "memoria"
+name = "blackbox"
 path = "src/lib.rs"
 
 [[bin]]

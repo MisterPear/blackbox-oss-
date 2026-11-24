@@ -1,4 +1,4 @@
-use crate::ledger::{safe_truncate_str, MemoriaLedger, TaskAction};
+use crate::ledger::{safe_truncate_str, BlackBoxLedger, TaskAction};
 use crate::viewer::generate_html_report;
 use crate::wiretap::run_command_wiretap;
 use std::io;
@@ -28,12 +28,12 @@ pub struct RunAuditResult {
 }
 
 pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
-    let ledger = MemoriaLedger::new(config.db_path.clone())
+    let ledger = BlackBoxLedger::new(config.db_path.clone())
         .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
 
     // 1. Pre-flight Setup
     println!("══════════════════════════════════════════════════════════════════════");
-    println!(" [memoria run] INITIATING SUPERVISED AGENT EXECUTION");
+    println!(" [blackbox run] INITIATING SUPERVISED AGENT EXECUTION");
     println!(" Target Project: {}", config.project);
     println!(" Session ID:     {}", config.session);
     if let Some(issue) = &config.issue {
@@ -60,7 +60,7 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
     );
 
     // 2. Execute target command under physical wiretap
-    println!("\n[memoria run] Spawning agent under physical wiretap shim...\n");
+    println!("\n[blackbox run] Spawning agent under physical wiretap shim...\n");
     let agent_exit_code = run_command_wiretap(
         &config.cmd,
         &config.project,
@@ -69,7 +69,7 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
     )?;
 
     println!("\n══════════════════════════════════════════════════════════════════════");
-    println!(" [memoria run] AGENT TERMINATED (Exit Code: {})", agent_exit_code);
+    println!(" [blackbox run] AGENT TERMINATED (Exit Code: {})", agent_exit_code);
     println!(" INITIATING GROUND-TRUTH PHYSICAL VERIFICATION");
     println!(" Rule: Do not trust exit code 0 alone.");
     println!("══════════════════════════════════════════════════════════════════════\n");
@@ -126,7 +126,7 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
 
     // 6. Physical Verification Step 4: Independent Verification Command (--verify-cmd)
     if let Some(verify_cmd) = &config.verify_cmd {
-        println!("[memoria run] Executing independent host verification: `{}`", verify_cmd);
+        println!("[blackbox run] Executing independent host verification: `{}`", verify_cmd);
         let status = Command::new("sh")
             .arg("-c")
             .arg(verify_cmd)
@@ -139,7 +139,7 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
                 verify_cmd, code
             ));
         } else {
-            println!("[memoria run] Host verification command passed cleanly.");
+            println!("[blackbox run] Host verification command passed cleanly.");
         }
     }
 
@@ -165,7 +165,7 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
     );
 
     // 8. Generate Air-Gapped HTML Report
-    let report_filename = format!("memoria_flight_report_{}.html", config.session);
+    let report_filename = format!("blackbox_flight_report_{}.html", config.session);
     let html_out = generate_html_report(
         &config.project,
         config.db_path.clone(),
@@ -189,13 +189,13 @@ pub fn execute_supervised_run(config: RunConfig) -> io::Result<RunAuditResult> {
 
     println!("\n══════════════════════════════════════════════════════════════════════");
     if verification_passed {
-        println!(" [memoria run] ✅ AUDIT VERIFIED: ALL PHYSICAL PREDICATES SATISFIED");
+        println!(" [blackbox run] ✅ AUDIT VERIFIED: ALL PHYSICAL PREDICATES SATISFIED");
         println!(" Cryptographic blocks verified: {}", block_count);
         if let Some(p) = &html_out {
             println!(" Flight report:                 {}", p.display());
         }
     } else {
-        println!(" [memoria run] ❌ AUDIT FAILED: UNVERIFIED EXECUTION DETECTED");
+        println!(" [blackbox run] ❌ AUDIT FAILED: UNVERIFIED EXECUTION DETECTED");
         for r in &failure_reasons {
             println!("  • {}", r);
         }
@@ -227,7 +227,7 @@ fn generate_markdown_audit_report(
     };
 
     let mut md = format!(
-        "### Memoria Execution & Physical Flight Audit\n\n{}\n\n- **Project**: `{}`\n- **Session**: `{}`\n- **Process Exit Code**: `{}`\n- **Cryptographic Blocks**: `{}` blocks sealed to genesis\n\n",
+        "### Black Box Execution & Physical Flight Audit\n\n{}\n\n- **Project**: `{}`\n- **Session**: `{}`\n- **Process Exit Code**: `{}`\n- **Cryptographic Blocks**: `{}` blocks sealed to genesis\n\n",
         status_badge, config.project, config.session, exit_code, block_count
     );
 
@@ -283,7 +283,7 @@ fn generate_markdown_audit_report(
 }
 
 fn sync_github_issue(issue_num: &str, passed: bool, auto_close: bool, summary: &str) {
-    println!("[memoria run] Syncing audit findings with GitHub Issue #{}...", issue_num);
+    println!("[blackbox run] Syncing audit findings with GitHub Issue #{}...", issue_num);
 
     let comment_res = Command::new("gh")
         .args(["issue", "comment", issue_num, "--body", summary])
@@ -291,24 +291,24 @@ fn sync_github_issue(issue_num: &str, passed: bool, auto_close: bool, summary: &
 
     match comment_res {
         Ok(out) if out.status.success() => {
-            println!("[memoria run] Audit report posted to Issue #{}.", issue_num);
+            println!("[blackbox run] Audit report posted to Issue #{}.", issue_num);
             if passed && auto_close {
                 let close_res = Command::new("gh")
-                    .args(["issue", "close", issue_num, "--comment", "Closed by Memoria supervisor following verified physical flight audit."])
+                    .args(["issue", "close", issue_num, "--comment", "Closed by Black Box supervisor following verified physical flight audit."])
                     .output();
                 if let Ok(c_out) = close_res {
                     if c_out.status.success() {
-                        println!("[memoria run] Issue #{} marked completed and closed.", issue_num);
+                        println!("[blackbox run] Issue #{} marked completed and closed.", issue_num);
                     }
                 }
             }
         }
         Ok(out) => {
             let err = String::from_utf8_lossy(&out.stderr);
-            println!("[memoria run] Note: `gh` CLI comment failed (status: {}): {}", out.status, err.trim());
+            println!("[blackbox run] Note: `gh` CLI comment failed (status: {}): {}", out.status, err.trim());
         }
         Err(_) => {
-            println!("[memoria run] Note: `gh` CLI not available on PATH. Skipping remote issue sync.");
+            println!("[blackbox run] Note: `gh` CLI not available on PATH. Skipping remote issue sync.");
         }
     }
 }

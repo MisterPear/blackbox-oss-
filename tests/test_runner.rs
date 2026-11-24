@@ -1,4 +1,4 @@
-use memoria::runner::{execute_supervised_run, RunConfig};
+use blackbox::runner::{execute_supervised_run, RunConfig};
 use tempfile::tempdir;
 
 #[test]

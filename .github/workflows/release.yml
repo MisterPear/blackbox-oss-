@@ -28,12 +28,12 @@ jobs:
         run: cargo build --release --target x86_64-unknown-linux-musl
 
       - name: Strip binary
-        run: strip target/x86_64-unknown-linux-musl/release/memoria
+        run: strip target/x86_64-unknown-linux-musl/release/blackbox
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: target/x86_64-unknown-linux-musl/release/memoria
+          files: target/x86_64-unknown-linux-musl/release/blackbox
           draft: false
           prerelease: false
           generate_release_notes: true

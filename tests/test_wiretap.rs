@@ -1,6 +1,6 @@
-use memoria::ledger::MemoriaLedger;
-use memoria::viewer::generate_html_report;
-use memoria::wiretap::run_command_wiretap;
+use blackbox::ledger::BlackBoxLedger;
+use blackbox::viewer::generate_html_report;
+use blackbox::wiretap::run_command_wiretap;
 use tempfile::tempdir;
 
 #[test]
@@ -15,7 +15,7 @@ fn test_command_wiretap_and_export() {
     assert_eq!(code, 0);
 
     // Verify recorded in ledger
-    let ledger = MemoriaLedger::new(Some(db_path.clone())).unwrap();
+    let ledger = BlackBoxLedger::new(Some(db_path.clone())).unwrap();
     let actions = ledger.get_recent_actions("unit_test", 10).unwrap();
     assert_eq!(actions.len(), 1);
     assert_eq!(actions[0].target, "echo");
@@ -53,7 +53,7 @@ fn test_exact_byte_accounting() {
     let code = run_command_wiretap(&cmd, "bytes_test", "sess_b", Some(db_path.clone())).unwrap();
     assert_eq!(code, 0);
 
-    let ledger = MemoriaLedger::new(Some(db_path)).unwrap();
+    let ledger = BlackBoxLedger::new(Some(db_path)).unwrap();
     let actions = ledger.get_recent_actions("bytes_test", 1).unwrap();
     assert_eq!(actions.len(), 1);
     // Should be exactly 10,000 bytes counted, not capped at 50 lines or 4096

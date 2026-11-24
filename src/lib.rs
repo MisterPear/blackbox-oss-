@@ -4,4 +4,4 @@ pub mod runner;
 pub mod viewer;
 pub mod wiretap;
 
-pub use ledger::MemoriaLedger;
+pub use ledger::{BlackBoxLedger, MemoriaLedger};

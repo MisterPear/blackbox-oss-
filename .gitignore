@@ -1,7 +1,10 @@
 target/
 .memoria/
+.blackbox/
 memoria_audit_*.html
+blackbox_audit_*.html
 memoria_flight_report_*.html
+blackbox_flight_report_*.html
 *.db
 *.db-wal
 *.db-shm
