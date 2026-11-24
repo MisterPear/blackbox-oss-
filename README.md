@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/icon.svg?v=2" width="220" height="220" alt="black box" />
+  <img src="assets/blackbox-squircle.svg" width="220" height="220" alt="black box" />
 </p>
 
-<h1 align="center">black box <img src="assets/square.svg?v=2" height="24" style="vertical-align: baseline;" alt="■" /></h1>
+<h1 align="center">black box <img src="assets/blackbox-squircle-dot.svg" height="24" style="vertical-align: baseline;" alt="■" /></h1>
 
 <p align="center">
   <strong>Out-of-band immutable action ledger and execution flight recorder for autonomous AI agents.</strong>
