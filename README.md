@@ -9,11 +9,14 @@
 </p>
 
 <p align="center">
-  <a href="#30-second-quickstart">Quickstart</a> •
-  <a href="docs/PROVENANCE.md">Verifiable Provenance</a> •
-  <a href="#out-of-band-lifecycle-supervision-blackbox-run">Supervisor</a> •
-  <a href="https://www.mallard.ink">Mallard Unified Industries</a>
+  <a href="#30-second-quickstart">Quickstart</a> &middot;
+  <a href="docs/PROVENANCE.md">Verifiable Provenance</a> &middot;
+  <a href="#out-of-band-lifecycle-supervision-blackbox-run">Supervisor</a> &middot;
+  <a href="#next-witness--the-hardware-spectator-v040">Witness (v0.4.0)</a> &middot;
+  <a href="https://www.mallard.ink/blackbox">Mallard Unified Industries</a>
 </p>
+
+> **Next Release**: **[witness (v0.4.0)](#next-witness--the-hardware-spectator-v040)** &mdash; Air-gapping the flight recorder to iOS/Android with biometric hardware approval.
 
 ---
 
@@ -85,6 +88,52 @@ chmod +x /usr/local/bin/blackbox
 cargo build --release --target x86_64-unknown-linux-musl
 sudo cp target/x86_64-unknown-linux-musl/release/blackbox /usr/local/bin/
 ```
+
+---
+
+## Next: witness &middot; The Hardware Spectator (v0.4.0)
+
+<p align="center">
+  <img src="assets/witness-logo.svg" width="180" height="180" alt="witness emblem" />
+</p>
+
+<p align="center">
+  <em>&ldquo;An agent running on your laptop can write to your laptop. It cannot write to your phone.&rdquo;</em>
+</p>
+
+While `black box` records execution on the host boundary, an autonomous agent running with local shell privileges could theoretically attempt to modify or delete host-level logs. 
+
+**witness** eliminates this attack surface by extending the telemetry boundary to an external physical device (iOS / Android) over authenticated local mTLS:
+
+```mermaid
+flowchart LR
+    subgraph Host ["Host Workstation / Laptop"]
+        Agent["Autonomous Agent<br/>(Claude Code, OpenClaw)"]
+        Wiretap["blackbox Wiretap<br/>(Local Execution Boundary)"]
+        Agent -->|"1. Submits action"| Wiretap
+    end
+
+    subgraph Phone ["Physical Spectator (Phone)"]
+        Witness["witness Service<br/>• Secure Enclave Storage<br/>• Read-Only SHA-256 Ledger<br/>• Biometric Air-Lock"]
+    end
+
+    Wiretap -.->|"2. Streams SHA-256 Receipts (mTLS)"| Witness
+    Witness -->|"3. Hardware Biometric Grant (FaceID)"| Wiretap
+    Wiretap -->|"4. Executes"| Tools["System Shell / APIs"]
+```
+
+### Two Layers of Separation
+1. **Physical Hardware Boundary**: Telemetry streams out-of-band over local authenticated mTLS to sandboxed mobile storage. The host agent has **zero write permissions** to the remote spectator device.
+2. **Incentive Decoupling**: The worker agent wants to complete tasks and look good; the spectator has no deliverables, no prompt, and nothing to defend. It is an auditor, not a participant—hardware keeps it from tampering, incentives keep it from wanting to.
+
+> **The Thesis**: *The ledger proves what happened; the spectator proves the worker didn't touch the ledger.*
+
+### Key Capabilities
+- **Read-Only Enclave Ledger**: Cryptographic audit hashes stream to mobile Secure Enclave storage, making retroactive tampering mathematically impossible.
+- **Biometric Hardware Air-Lock**: Critical destructive actions (`git push --force`, `drop table`, payments, root credentials) pause execution on the host terminal until approved via FaceID / Fingerprint on your phone.
+- **Live Visual Spectator Window**: Real-time cursor and step stream rendering thinking state and tool execution live as it happens.
+
+[Follow Milestone v0.4.0 on GitHub &rarr;](https://github.com/MisterPear/blackbox-oss-/milestones)
 
 ---
 

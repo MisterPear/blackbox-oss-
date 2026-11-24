@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Background Warm Cream -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#FAF4DD" />
+
+  <g id="witness-4-finger-logo" transform="translate(40, 20)">
+    <!-- 1. THE EYE (peeking through the parted gap) -->
+    <g id="eye">
+      <!-- Angular Geometric Eyebrow / Upper Hood -->
+      <polygon points="620,380 750,380 690,430 635,400" fill="#080D06" />
+      
+      <!-- Eye Sclera (White base) -->
+      <path d="M 490,490 Q 620,410 740,480 Q 620,545 490,490 Z" fill="#FAF4DD" stroke="#080D06" stroke-width="20" stroke-linejoin="miter" />
+      
+      <!-- Iris in Burnt Orange (#BC592A) -->
+      <circle cx="618" cy="482" r="48" fill="#BC592A" />
+      
+      <!-- Pupil in Ink Black (#080D06) -->
+      <circle cx="618" cy="482" r="26" fill="#080D06" />
+      
+      <!-- Catchlight glint -->
+      <circle cx="630" cy="470" r="8" fill="#FAF4DD" />
+      
+      <!-- Lower eyelid line -->
+      <path d="M 515,535 Q 618,555 700,530" stroke="#080D06" stroke-width="12" fill="none" stroke-linecap="square" />
+    </g>
+
+    <!-- 2. THE HAND (EXACTLY 4 FINGERS: 2 DIAGONAL UP, 2 HORIZONTAL) -->
+    <!-- Solid Unified Palm -->
+    <polygon points="190,440 370,440 380,800 190,800" fill="#080D06" />
+
+    <!-- Finger 4 (Bottom Horizontal) -->
+    <!-- From x=370, y=715 to x=690, y=715. Height=85 -->
+    <path d="M 370,715 L 670,715 A 42.5,42.5 0 0,1 670,800 L 370,800 Z" fill="#080D06" />
+    <!-- Fingernail 4 -->
+    <path d="M 665,732 A 25,25 0 0,1 665,782 L 678,782 A 25,25 0 0,0 678,732 Z" fill="#FAF4DD" />
+
+    <!-- Finger 3 (Upper Horizontal) -->
+    <!-- From x=370, y=595 to x=770, y=595. Height=85 -->
+    <path d="M 370,595 L 755,595 A 42.5,42.5 0 0,1 755,680 L 370,680 Z" fill="#080D06" />
+    <!-- Fingernail 3 -->
+    <path d="M 750,612 A 25,25 0 0,1 750,662 L 763,662 A 25,25 0 0,0 763,612 Z" fill="#FAF4DD" />
+
+    <!-- Finger 2 (Diagonal Upper-Right, ~34 deg) -->
+    <!-- Pivot around (370, 520) -->
+    <g transform="rotate(-34 370 520)">
+      <path d="M 330,477.5 L 750,477.5 A 42.5,42.5 0 0,1 750,562.5 L 330,562.5 Z" fill="#080D06" />
+      <!-- Fingernail 2 -->
+      <path d="M 745,494.5 A 25,25 0 0,1 745,544.5 L 758,544.5 A 25,25 0 0,0 758,494.5 Z" fill="#FAF4DD" />
+    </g>
+
+    <!-- Finger 1 (Top Diagonal Upward, ~58 deg) -->
+    <!-- Pivot around (270, 470) -->
+    <g transform="rotate(-58 270 470)">
+      <path d="M 240,427.5 L 680,427.5 A 42.5,42.5 0 0,1 680,512.5 L 240,512.5 Z" fill="#080D06" />
+      <!-- Fingernail 1 -->
+      <path d="M 675,444.5 A 25,25 0 0,1 675,494.5 L 688,494.5 A 25,25 0 0,0 688,444.5 Z" fill="#FAF4DD" />
+    </g>
+  </g>
+</svg>
