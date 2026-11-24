@@ -94,7 +94,7 @@ sudo cp target/x86_64-unknown-linux-musl/release/blackbox /usr/local/bin/
 ## Next: witness &middot; The Hardware Spectator (v0.4.0)
 
 <p align="center">
-  <img src="assets/witness-logo.svg" width="180" height="180" alt="witness emblem" />
+  <img src="assets/witness-squircle.svg" width="180" height="180" alt="witness emblem" />
 </p>
 
 <p align="center">
