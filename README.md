@@ -81,7 +81,7 @@ The human operator installs **black box** outside the agent's environment. The a
 
 ```bash
 # Download the prebuilt zero-dependency static binary (musl) from GitHub Releases:
-curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/blackbox -o /usr/local/bin/blackbox
+curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/blackbox
 chmod +x /usr/local/bin/blackbox
 
 # Or build from source with the static musl target:
@@ -183,6 +183,7 @@ In your `claude_desktop_config.json` or `cursor.json`:
 
 ---
 
+<a id="supervisor"></a>
 ## Out-of-Band Lifecycle Supervision (`blackbox run`)
 
 Supervise autonomous agents with strict ground-truth verification and automated issue tracking:
