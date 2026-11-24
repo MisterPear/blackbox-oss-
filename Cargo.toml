@@ -9,6 +9,14 @@ readme = "README.md"
 homepage = "https://www.mallard.ink"
 repository = "https://github.com/MisterPear/memoria-oss"
 
+[lib]
+name = "memoria"
+path = "src/lib.rs"
+
+[[bin]]
+name = "blackbox"
+path = "src/main.rs"
+
 [dependencies]
 rusqlite = { version = "0.31", features = ["bundled"] }
 sha2 = "0.10"

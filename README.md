@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#30-second-quickstart">Quickstart</a> •
   <a href="docs/PROVENANCE.md">Verifiable Provenance</a> •
-  <a href="#out-of-band-lifecycle-supervision-memoria-run">Supervisor</a> •
+  <a href="#out-of-band-lifecycle-supervision-blackbox-run">Supervisor</a> •
   <a href="https://www.mallard.ink">Mallard Unified Industries</a>
 </p>
 
@@ -29,9 +29,9 @@ Autonomous AI agents suffer from an alignment reflex: **they lie.**
 
 ---
 
-## What is Memoria?
+## What is black box?
 
-Memoria is a **transparent physical wiretap** that sits at the execution boundary between your agent and the operating system.
+**black box** is a **transparent physical wiretap** that sits at the execution boundary between your agent and the operating system.
 
 It intercepts every CLI command, MCP tool call, and system action as it leaves the agent, automatically recording physical execution into an **immutable, cryptographically chained flight ledger**.
 
@@ -40,7 +40,7 @@ The agent has **read-only access** to ground itself in reality, but **zero permi
 ```mermaid
 flowchart LR
     Agent["Autonomous Agent<br/>(Claude Code, OpenClaw, LangChain)"]
-    Bridge["Memoria Wiretap<br/>(Transparent stdio / process shim)"]
+    Bridge["black box Wiretap<br/>(Transparent stdio / process shim)"]
     Tools["Physical Execution<br/>(Bash, MCP Servers, APIs)"]
     Ledger[("Immutable TaskLedger<br/>• SHA-256 Hash Chain<br/>• Raw Exit Codes & Bytes<br/>• Microsecond Timestamps")]
 
@@ -57,7 +57,7 @@ flowchart LR
 
 ## The Two-Part Architecture
 
-Memoria splits agent memory into two decoupled tiers:
+**black box** splits agent memory into two decoupled tiers:
 
 1. **`TaskLedger` (The Physical Flight Recorder)**:
    - Microsecond timestamps ($t_{\text{start}}$, $t_{\text{end}}$, duration).
@@ -74,51 +74,49 @@ Memoria splits agent memory into two decoupled tiers:
 
 ### 1. Human Installation (Never Installed by the Agent)
 
-The human operator installs Memoria outside the agent's environment. The agent never installs or touches the auditor:
+The human operator installs **black box** outside the agent's environment. The agent never installs or touches the auditor:
 
 ```bash
 # Download the prebuilt zero-dependency static binary (musl) from GitHub Releases:
-curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/memoria -o /usr/local/bin/memoria
-chmod +x /usr/local/bin/memoria
+curl -fsSL https://github.com/MisterPear/memoria-oss/releases/latest/download/blackbox -o /usr/local/bin/blackbox
+chmod +x /usr/local/bin/blackbox
 
 # Or build from source with the static musl target:
 cargo build --release --target x86_64-unknown-linux-musl
-sudo cp target/x86_64-unknown-linux-musl/release/memoria /usr/local/bin/
+sudo cp target/x86_64-unknown-linux-musl/release/blackbox /usr/local/bin/
 ```
 
 ---
 
 ## Verifiable Open Provenance
 
-Memoria practices self-hosting auditability: the `v0.2.0` release was recorded and cryptographically verified using Memoria itself.
+**black box** practices self-hosting auditability: the `v0.2.0` and `v0.3.0` releases were recorded and cryptographically verified using **black box** itself.
 
 See [docs/PROVENANCE.md](docs/PROVENANCE.md) for the complete cryptographic hash chain, execution telemetry, and milestone audit log.
 
 ---
 
----
-
 ## Harness Integration Snippets
 
-Memoria is 100% harness-agnostic. You do not need separate installers—just configure your harness to route tool calls or commands through `memoria`:
+**black box** is 100% harness-agnostic. You do not need separate installers—just configure your harness to route tool calls or commands through `blackbox`:
 
 ### 1. Claude Code
 Prefix your Claude Code session:
 ```bash
-memoria wrap -- claude-code
+blackbox wrap -- claude-code
 ```
-Or route internal bash calls through `memoria wrap -- <cmd>`.
+Or route internal bash calls through `blackbox wrap -- <cmd>`.
 
 ### 2. OpenClaw
-Run OpenClaw inside the Memoria wiretap:
+Run OpenClaw inside the black box wiretap:
 ```bash
-memoria wrap -- openclaw run
+blackbox wrap -- openclaw run
 ```
 
 ### 3. Gemini CLI / Standalone Agent Scripts
 Wrap any agent script or CLI:
 ```bash
-memoria wrap -- gemini run "Analyze codebase and run unit tests"
+blackbox wrap -- gemini run "Analyze codebase and run unit tests"
 ```
 
 ### 4. Cursor / Claude Desktop (Model Context Protocol)
@@ -127,7 +125,7 @@ In your `claude_desktop_config.json` or `cursor.json`:
 {
   "mcpServers": {
     "terminal": {
-      "command": "memoria",
+      "command": "blackbox",
       "args": ["mcp", "--project", "my-repo", "--", "npx", "-y", "@modelcontextprotocol/server-terminal"]
     }
   }
@@ -136,14 +134,14 @@ In your `claude_desktop_config.json` or `cursor.json`:
 
 ---
 
-## Out-of-Band Lifecycle Supervision (`memoria run`)
+## Out-of-Band Lifecycle Supervision (`blackbox run`)
 
 Supervise autonomous agents with strict ground-truth verification and automated issue tracking:
 
 ```bash
 # Supervise an agent working on GitHub Issue #2
 # Rule: Do not trust exit code 0 alone. Require physical test execution and clean host verification.
-memoria run --issue 2 --verify-cmd "cargo test" --require-tests --auto-close -- claude-code
+blackbox run --issue 2 --verify-cmd "cargo test" --require-tests --auto-close -- claude-code
 ```
 
 **What the supervisor enforces:**
@@ -161,49 +159,49 @@ memoria run --issue 2 --verify-cmd "cargo test" --require-tests --auto-close -- 
 When you (or the agent) want to verify what was actually executed:
 ```bash
 # Query the physical action index
-memoria actions --limit 5
+blackbox actions --limit 5
 
 # Query project milestone context
-memoria context
+blackbox context
 
 # Verify cryptographic hash chain integrity
-memoria verify
+blackbox verify
 ```
 
-### 5. Export Standalone Air-Gapped HTML Report
+### Export Standalone Air-Gapped HTML Report
 Generate an interactive, standalone HTML audit report:
 ```bash
-memoria export --out flight_report.html
+blackbox export --out flight_report.html
 ```
 
 ---
 
-## The Agent Contract (`MEMORIA.md`)
+## The Agent Contract (`BLACKBOX.md`)
 
-Drop `MEMORIA.md` into your repository. It instructs OpenClaw, Claude Code, Cursor, or any agent framework:
+Drop `BLACKBOX.md` into your repository. It instructs OpenClaw, Claude Code, Cursor, or any agent framework:
 1. That its execution is being recorded at the wire.
 2. That it cannot delete or forge logs.
-3. How to run `memoria actions` to ground its answers in physical reality before claiming a task is complete.
+3. How to run `blackbox actions` to ground its answers in physical reality before claiming a task is complete.
 
 ---
 
 ## Storage & Configuration
 
-By default, Memoria stores its append-only ledger locally inside each project's directory:
+By default, **black box** stores its append-only ledger locally inside each project's directory:
 
-* **Default Location**: `./.memoria/memoria.db` (created automatically in the current working directory).
+* **Default Location**: `./.blackbox/blackbox.db` (created automatically in the current working directory).
 * **CLI Override**: Pass `--db <path>` to any command:
   ```bash
-  memoria --db /var/log/audit.db actions
+  blackbox --db /var/log/audit.db actions
   ```
-* **Environment Variable Override**: Set `MEMORIA_DB_PATH` in your shell or CI environment:
+* **Environment Variable Override**: Set `BLACKBOX_DB_PATH` in your shell or CI environment:
   ```bash
-  export MEMORIA_DB_PATH="/opt/audit/production.db"
+  export BLACKBOX_DB_PATH="/opt/audit/production.db"
   ```
 * **Project Scoping**: Isolate multiple projects or sessions within the same ledger using `--project`:
   ```bash
-  memoria --project frontend-app wrap -- npm test
-  memoria --project backend-api wrap -- pytest
+  blackbox --project frontend-app wrap -- npm test
+  blackbox --project backend-api wrap -- pytest
   ```
 
 ---

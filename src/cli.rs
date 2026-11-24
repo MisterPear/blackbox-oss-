@@ -256,8 +256,8 @@ pub fn run() {
                 (_, Some(a)) => a,
                 (true, None) => "human".to_string(),
                 (false, None) => {
-                    if std::env::var("MEMORIA_REQUIRE_HUMAN_STAGE").is_ok() {
-                        eprintln!("[memoria] ACCESS DENIED: MEMORIA_REQUIRE_HUMAN_STAGE is set. Stages must be recorded with --human.");
+                    if std::env::var("BLACKBOX_REQUIRE_HUMAN_STAGE").is_ok() || std::env::var("MEMORIA_REQUIRE_HUMAN_STAGE").is_ok() {
+                        eprintln!("[blackbox] ACCESS DENIED: BLACKBOX_REQUIRE_HUMAN_STAGE is set. Stages must be recorded with --human.");
                         process::exit(1);
                     }
                     "agent".to_string()

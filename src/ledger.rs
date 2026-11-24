@@ -60,10 +60,14 @@ impl MemoriaLedger {
         let path = match db_path {
             Some(p) => p,
             None => {
-                if let Ok(env_path) = std::env::var("MEMORIA_DB_PATH") {
+                if let Ok(env_path) = std::env::var("BLACKBOX_DB_PATH").or_else(|_| std::env::var("MEMORIA_DB_PATH")) {
                     PathBuf::from(env_path)
-                } else {
+                } else if std::path::Path::new(".blackbox").exists() {
+                    PathBuf::from(".blackbox").join("blackbox.db")
+                } else if std::path::Path::new(".memoria").exists() {
                     PathBuf::from(".memoria").join("memoria.db")
+                } else {
+                    PathBuf::from(".blackbox").join("blackbox.db")
                 }
             }
         };
